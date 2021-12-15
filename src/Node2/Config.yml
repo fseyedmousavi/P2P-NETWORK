@@ -1,5 +1,5 @@
 node_number : 2
-node_port : 8080
+node_port : 8081
 owned_files_dir : "Node2/ownedFiles/"
 new_files_dir : "Node2/newFiles/"
 owned_files :
