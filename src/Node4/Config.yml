@@ -1,0 +1,16 @@
+node_number : 4
+node_port : 8083
+owned_files_dir : "Node4/ownedFiles/"
+new_files_dir : "Node4/newFiles/"
+owned_files :
+        - "file7"
+        - "file8"
+friend_nodes :
+        -
+                node_number : 1
+                node_port : 8080
+        -
+                node_number : 3
+                node_port : 8082 
+
+

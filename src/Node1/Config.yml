@@ -8,9 +8,9 @@ owned_files :
         - "file3"
 friend_nodes :
         -
-                node_name : 2
+                node_number : 2
                 node_port : 8081
         -
-                node_name : 3
+                node_number : 3
                 node_port : 8082 
 
