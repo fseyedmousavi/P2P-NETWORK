@@ -5,7 +5,6 @@ import shutil
 import requests
 import logging
 
-
 app = Flask(__name__)
 
 file1 = open("Config.yml")
@@ -24,15 +23,21 @@ def response(file_requested, nnu):
     else:
         nodes: list = current_node['friend_nodes']
         x = [i for i in nodes if not (i['node_name'] == int(nnu))]
-        return jsonify({"dict": find_closest(current_node['node_name'], nodes)})
+        return jsonify({"dict": find_closest(current_node['node_name'], x)})
 
 
 def find_closest(current_number: int, friends: list):
     closest = friends[0]
 
     for f in friends:
-        x = closest['node_name'] - current_number
-        y = f['node_name'] - current_number
+        if closest['node_name'] > current_number:
+            x = closest['node_name'] - current_number
+        else:
+            x = current_number - closest['node_name']
+        if f['node_name'] > current_number:
+            y = f['node_name'] - current_number
+        else:
+            y = current_number - f['node_name']
         if x > y:
             closest = f
     return closest
@@ -47,10 +52,9 @@ def request(next_node: dict):
     if rep.__contains__("dict"):
         nodes_visited.append(next_node)
         if nodes_visited.__contains__(rep["dict"]):
-            request(find_closest(current_node['node_name'], current_node['friend_nodes']))
+            request(find_closest(current_node['node_number'], current_node['friend_nodes']))
         else:
-            logging.info("another path to node number " +
-                         str(rep["dict"]['node_name']) + "was introduced")
+            logging.info("another path to node number " + str(rep["dict"]['node_name']) + "was introduced")
             request(rep["dict"])
     elif rep.__contains__("string"):
         original = r'' + rep["string"]
