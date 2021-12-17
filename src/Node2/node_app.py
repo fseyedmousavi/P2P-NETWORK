@@ -5,7 +5,6 @@ import shutil
 import requests
 import logging
 
-
 app = Flask(__name__)
 
 file1 = open("Config.yml")
@@ -26,20 +25,29 @@ def response(file_requested, nnu):
         x = [i for i in nodes if not (i['node_name'] == int(nnu))]
         return jsonify({"dict": find_closest(current_node['node_name'], nodes)})
 
+
 def find_closest(current_number: int, friends: list):
     closest = friends[0]
 
     for f in friends:
-        x = closest['node_name'] - current_number
-        y = f['node_name'] - current_number
+        if closest['node_name'] > current_number:
+            x = closest['node_name'] - current_number
+        else:
+            x = current_number - closest['node_name']
+        if f['node_name'] > current_number:
+            y = f['node_name'] - current_number
+        else:
+            y = current_number - f['node_name']
         if x > y:
             closest = f
     return closest
 
+
 def request(next_node: dict):
     # reply is a string of file path (type: str)
     # if another node was returned (type: dict)
-    request_str = "http://127.0.0.1:" + str(next_node['node_port']) + '/' + str(file_name) + '/' + str(current_node['node_number'])
+    request_str = "http://127.0.0.1:" + str(next_node['node_port']) + '/' + str(file_name) + '/' + str(
+        current_node['node_number'])
     reply = requests.get(request_str)
     rep = reply.json()
     if rep.__contains__("dict"):
@@ -63,7 +71,8 @@ if not (string.__contains__('request')):
     logging.info('INVALID INPUT')
 else:
     file_name = string[8:]
-    request(find_closest(current_node['node_number'], current_node['friend_nodes']))
+    friend = find_closest(current_node['node_number'], current_node['friend_nodes'])
+    request(current_node['friend_nodes'][0])
 
 if __name__ == "__main__":
     app.run(port=current_node['node_port'])

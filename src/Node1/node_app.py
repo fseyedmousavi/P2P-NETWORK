@@ -17,7 +17,7 @@ file_name = ""
 logging.getLogger().setLevel(logging.INFO)
 
 
-@app.route('/<file_requested>/<node_number>', methods=['GET'])
+@app.route('/<string:file_requested>/<string:nnu>', methods=['GET'])
 def response(file_requested, nnu):
     if current_node['owned_files'].__contains__(file_requested):
         return jsonify({"string": '../Node' + str(current_node['node_number']) + '/ownedFiles/' + str(file_requested)})
@@ -25,6 +25,7 @@ def response(file_requested, nnu):
         nodes: list = current_node['friend_nodes']
         x = [i for i in nodes if not (i['node_name'] == int(nnu))]
         return jsonify({"dict": find_closest(current_node['node_name'], nodes)})
+
 
 def find_closest(current_number: int, friends: list):
     closest = friends[0]
@@ -35,6 +36,7 @@ def find_closest(current_number: int, friends: list):
         if x > y:
             closest = f
     return closest
+
 
 def request(next_node: dict):
     # reply is a string of file path (type: str)
