@@ -17,24 +17,36 @@ file_name = ""
 logging.getLogger().setLevel(logging.INFO)
 
 
-@app.route('/<file_requested>/<node_number>', methods=['GET'])
-def response(file_requested, nnu):
+@app.route('/<string:file_requested>/<string:node_number>', methods=['GET'])
+def response(file_requested, node_number):
     if current_node['owned_files'].__contains__(file_requested):
         return jsonify({"string": '../Node' + str(current_node['node_number']) + '/ownedFiles/' + str(file_requested)})
     else:
         nodes: list = current_node['friend_nodes']
-        x = [i for i in nodes if not (i['node_name'] == int(nnu))]
-        return jsonify({"dict": find_closest(current_node['node_name'], nodes)})
+        x = [i for i in nodes if not (i['node_name'] == int(node_number))]
+        for j in x:
+            fj = open("../Node" + str(j['node_name']) + "/Config.yml")
+            cj = yaml.load(fj, Loader=yaml.FullLoader)
+            if cj['owned_files'].__contains__(file_requested):
+                return jsonify({"dict": cj})
+        return jsonify({"dict": find_closest(current_node['node_number'], x)})
 
 def find_closest(current_number: int, friends: list):
     closest = friends[0]
 
     for f in friends:
-        x = closest['node_name'] - current_number
-        y = f['node_name'] - current_number
+        if closest['node_name'] > current_number:
+            x = closest['node_name'] - current_number
+        else:
+            x = current_number - closest['node_name']
+        if f['node_name'] > current_number:
+            y = f['node_name'] - current_number
+        else:
+            y = current_number - f['node_name']
         if x > y:
             closest = f
     return closest
+
 
 def request(next_node: dict):
     # reply is a string of file path (type: str)
@@ -48,7 +60,7 @@ def request(next_node: dict):
             request(find_closest(current_node['node_name'], current_node['friend_nodes']))
         else:
             logging.info("another path to node number " +
-                         str(rep["dict"]['node_name']) + "was introduced")
+                         str(rep["dict"]['node_number']) + " was introduced")
             request(rep["dict"])
     elif rep.__contains__("string"):
         original = r'' + rep["string"]
